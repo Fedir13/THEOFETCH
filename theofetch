@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Tokyo Night Colors & Grays
+PURPLE='\033[0;38;5;147m'
+CYAN='\033[0;38;5;75m'
+BLUE='\033[0;38;5;75m'
+GREEN='\033[0;38;5;114m'
+YELLOW='\033[0;38;5;222m'
+MAGENTA='\033[0;38;5;212m'
+GRAY='\033[0;38;5;248m'
+DIM='\033[2m'
+NC='\033[0m'
+
+# Detect Distro ID
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    DETECTED_ID=$ID
+else
+    DETECTED_ID="gentoo"
+fi
+
+# Parse CLI arguments for manual override
+FORCE_DISTRO=""
+for arg in "$@"; do
+    case $arg in
+        --fedora) FORCE_DISTRO="fedora" ;;
+        --gentoo) FORCE_DISTRO="gentoo" ;;
+        -h|--help)
+            echo "Usage: theofetch [--gentoo | --fedora]"
+            exit 0
+            ;;
+    esac
+done
+
+ACTIVE_DISTRO="${FORCE_DISTRO:-$DETECTED_ID}"
+
+# Logos (all in # symbols)
+GENTOO_LOGO="
+${PURPLE}  ######  ####### ##    ## ########  #######   #######
+ ######## ##      ###   ##    ##    ###   ### ###   ###
+ ##       ####### ####  ##    ##    ##     ## ##     ##
+ ##  #### ##      ## ## ##    ##    ##     ## ##     ##
+ ###  ### ##      ##  ####    ##    ###   ### ###   ###
+  ######  ####### ##   ###    ##     #######   #######${NC}"
+
+FEDORA_LOGO="
+${BLUE} ######## ######## ########   #######  ########     ###   
+ ##       ##       ##     ## ##     ## ##     ##   ## ##  
+ ######   ######   ##     ## ##     ## ########   ##   ## 
+ ##       ##       ##     ## ##     ## ##   ##   #########
+ ##       ##       ##     ## ##     ## ##    ##  ##     ##
+ ##       ######## ########   #######  ########  ##     ##${NC}"
+
+if [[ "$ACTIVE_DISTRO" == "fedora" ]]; then
+    LOGO="$FEDORA_LOGO"
+    DISTRO_NAME="Fedora Linux x86_64"
+    PKG_COUNT=$(rpm -qa 2>/dev/null | wc -l)
+    PKG_MGR="rpm"
+else
+    LOGO="$GENTOO_LOGO"
+    DISTRO_NAME="Gentoo Linux x86_64"
+    PKG_COUNT=$(qlist -I 2>/dev/null | wc -l)
+    PKG_MGR="emerge"
+fi
+
+# System Information
+USER_HOST="${USER}@$(hostname)"
+KERNEL=$(uname -r)
+UPTIME=$(uptime -p | sed 's/up //')
+LOADAVG=$(uptime | awk -F'load average:' '{ print $2 }' | xargs)
+WM="${XDG_CURRENT_DESKTOP:-Hyprland}"
+CPU=$(grep "model name" /proc/cpuinfo | head -1 | cut -d ":" -f2 | xargs | sed 's/(TM)//g; s/(R)//g; s/CPU //; s/ @.*//')
+RAM=$(free -h | awk '/^Mem:/ {print $3 " / " $2}')
+SWAP=$(free -h | awk '/^Swap:/ {print $3 " / " $2}')
+DISK=$(df -h / | awk 'NR==2 {print $3 " / " $2 " (" $5 ")"}')
+SHELL_NAME=$(basename "$SHELL")
+
+# Print Header Logo
+echo -e "$LOGO"
+echo ""
+
+# Border Box Top
+echo -e "  ${GRAY}╭──────────────────────────────────────────────╮${NC}"
+
+# Print Info Rows inside Box
+print_row() {
+    local icon="$1"
+    local label="$2"
+    local val="$3"
+    printf "  ${GRAY}│${NC} %s %-8s ${DIM}│${NC} %s\n" "$icon" "$label" "$val"
+}
+
+print_row "" "user" "$USER_HOST"
+print_row "󰅐" "uptime" "$UPTIME"
+print_row "󱎫" "load" "$LOADAVG"
+print_row "" "distro" "$DISTRO_NAME"
+print_row "" "kernel" "$KERNEL"
+print_row "" "wm" "$WM"
+print_row "󰍛" "cpu" "$CPU"
+print_row "" "memory" "$RAM"
+print_row "󰓡" "swap" "$SWAP"
+print_row "󰉉" "disk" "$DISK"
+print_row "󰮯" "pkgs" "$PKG_COUNT $PKG_MGR"
+print_row "" "shell" "$SHELL_NAME"
+
+# Border Box Bottom / Colors
+echo -e "  ${GRAY}├──────────────────────────────────────────────┤${NC}"
+echo -e "  ${GRAY}│${NC}  colors  ${DIM}│${NC} \033[41m  \033[42m  \033[43m  \033[44m  \033[45m  \033[46m  \033[47m  ${NC}"
+echo -e "  ${GRAY}╰──────────────────────────────────────────────╯${NC}"
+echo ""
