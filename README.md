@@ -18,9 +18,9 @@ cd theofetch
 ## Usage
 
 ```bash
-theofetch          # Auto-detects OS/distro
-theofetch --gentoo # Force Gentoo logo & emerge pkgs
-theofetch --fedora # Force Fedora logo & rpm pkgs
-theofetch --xubuntu# Force Xubuntu logo & dpkg pkgs
-theofetch --macos  # Force  logo & brew pkgs
+theofetch           # Auto-detects OS/distro
+theofetch --gentoo  # Force Gentoo logo & emerge pkgs
+theofetch --fedora  # Force Fedora logo & rpm pkgs
+theofetch --xubuntu # Force Xubuntu logo & dpkg pkgs
+theofetch --macos   # Force  logo & brew pkgs
 ```
