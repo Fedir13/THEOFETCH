@@ -3,7 +3,7 @@
 # Tokyo Night Colors & Grays
 PURPLE='\033[0;38;5;147m'
 CYAN='\033[0;38;5;75m'
-BLUE='\033[0;38;5;75m'
+BLUE='\033[0;38;5;39m'
 GREEN='\033[0;38;5;114m'
 YELLOW='\033[0;38;5;222m'
 MAGENTA='\033[0;38;5;212m'
@@ -15,6 +15,7 @@ NC='\033[0m'
 if [ -f /etc/os-release ]; then
     . /etc/os-release
     DETECTED_ID=$ID
+    [[ "$ID_LIKE" =~ "ubuntu" || "$ID_LIKE" =~ "debian" ]] && DETECTED_ID="xubuntu"
 else
     DETECTED_ID="gentoo"
 fi
@@ -25,8 +26,9 @@ for arg in "$@"; do
     case $arg in
         --fedora) FORCE_DISTRO="fedora" ;;
         --gentoo) FORCE_DISTRO="gentoo" ;;
+        --xubuntu|--ubuntu) FORCE_DISTRO="xubuntu" ;;
         -h|--help)
-            echo "Usage: theofetch [--gentoo | --fedora]"
+            echo "Usage: theofetch [--gentoo | --fedora | --xubuntu]"
             exit 0
             ;;
     esac
@@ -34,7 +36,7 @@ done
 
 ACTIVE_DISTRO="${FORCE_DISTRO:-$DETECTED_ID}"
 
-# Logos (all in # symbols)
+# Logos (all in # symbols, 6 rows high)
 GENTOO_LOGO="
 ${PURPLE}  ######  ####### ##    ## ########  #######   #######
  ######## ##      ###   ##    ##    ###   ### ###   ###
@@ -44,18 +46,31 @@ ${PURPLE}  ######  ####### ##    ## ########  #######   #######
   ######  ####### ##   ###    ##     #######   #######${NC}"
 
 FEDORA_LOGO="
-${BLUE} ######## ######## ########   #######  ########     ###   
+${CYAN} ######## ######## ########   #######  ########     ###   
  ##       ##       ##     ## ##     ## ##     ##   ## ##  
  ######   ######   ##     ## ##     ## ########   ##   ## 
  ##       ##       ##     ## ##     ## ##   ##   #########
  ##       ##       ##     ## ##     ## ##    ##  ##     ##
  ##       ######## ########   #######  ########  ##     ##${NC}"
 
+XUBUNTU_LOGO="
+${BLUE}  ##   ## ##     ## ######## ##     ## ##    ## ######## ##     ## 
+  ##   ## ##     ## ##     ## ##     ## ###   ##    ##    ##     ## 
+   ## ##  ##     ## ######## ##     ## ####  ##    ##    ##     ## 
+    ###   ##     ## ##     ## ##     ## ## ## ##    ##    ##     ## 
+   ## ##  ##     ## ##     ## ##     ## ##  ####    ##    ##     ## 
+  ##   ##  #######  ########  #######  ##   ###    ##     #######  ${NC}"
+
 if [[ "$ACTIVE_DISTRO" == "fedora" ]]; then
     LOGO="$FEDORA_LOGO"
     DISTRO_NAME="Fedora Linux x86_64"
     PKG_COUNT=$(rpm -qa 2>/dev/null | wc -l)
     PKG_MGR="rpm"
+elif [[ "$ACTIVE_DISTRO" == "xubuntu" || "$ACTIVE_DISTRO" == "ubuntu" || "$ACTIVE_DISTRO" == "debian" ]]; then
+    LOGO="$XUBUNTU_LOGO"
+    DISTRO_NAME="Xubuntu Linux x86_64"
+    PKG_COUNT=$(dpkg-query -f '${binary:Package}\n' -W 2>/dev/null | wc -l)
+    PKG_MGR="dpkg"
 else
     LOGO="$GENTOO_LOGO"
     DISTRO_NAME="Gentoo Linux x86_64"
@@ -68,7 +83,7 @@ USER_HOST="${USER}@$(hostname)"
 KERNEL=$(uname -r)
 UPTIME=$(uptime -p | sed 's/up //')
 LOADAVG=$(uptime | awk -F'load average:' '{ print $2 }' | xargs)
-WM="${XDG_CURRENT_DESKTOP:-Hyprland}"
+WM="${XDG_CURRENT_DESKTOP:-XFCE}"
 CPU=$(grep "model name" /proc/cpuinfo | head -1 | cut -d ":" -f2 | xargs | sed 's/(TM)//g; s/(R)//g; s/CPU //; s/ @.*//')
 RAM=$(free -h | awk '/^Mem:/ {print $3 " / " $2}')
 SWAP=$(free -h | awk '/^Swap:/ {print $3 " / " $2}')
