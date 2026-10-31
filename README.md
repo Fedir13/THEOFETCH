@@ -1,11 +1,11 @@
 # theofetch ⚡
 
-A minimalist, beautifully styled custom fetch script written in Bash, featuring Tokyo Night colors, clean boxed metrics, and multi-distro support (`gentoo`, `fedora`, `xubuntu`).
+A minimalist, beautifully styled custom fetch script written in Bash, featuring Tokyo Night colors, clean boxed metrics, and multi-distro/OS support (`gentoo`, `fedora`, `xubuntu`, `macos`).
 
 ## Features
 - **Minimalist Boxed Layout:** Clean borders with icons for user, uptime, load avg, distro, kernel, WM, CPU, memory, swap, disk, packages, and shell.
-- **Multi-Distro Support:** Auto-detects your Linux distribution or allows manual overrides via flags.
-- **Tokyo Night Styling:** Gorgeous muted purple/cyan/blue color palette and color blocks.
+- **Multi-OS Support:** Auto-detects Linux distribution or macOS (`--macos`), with custom `#` symbol ASCII banners (`VASYA PAN.` for Mac).
+- **Tokyo Night Styling:** Gorgeous muted color palettes and color blocks.
 
 ## Installation
 
@@ -18,8 +18,9 @@ cd theofetch
 ## Usage
 
 ```bash
-theofetch          # Auto-detects distro
+theofetch          # Auto-detects OS/distro
 theofetch --gentoo # Force Gentoo logo & emerge pkgs
 theofetch --fedora # Force Fedora logo & rpm pkgs
 theofetch --xubuntu# Force Xubuntu logo & dpkg pkgs
+theofetch --macos  # Force VASYA PAN. logo & brew pkgs
 ```
