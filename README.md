@@ -22,5 +22,5 @@ theofetch          # Auto-detects OS/distro
 theofetch --gentoo # Force Gentoo logo & emerge pkgs
 theofetch --fedora # Force Fedora logo & rpm pkgs
 theofetch --xubuntu# Force Xubuntu logo & dpkg pkgs
-theofetch --macos  # Force VASYA PAN. logo & brew pkgs
+theofetch --macos  # Force  logo & brew pkgs
 ```
